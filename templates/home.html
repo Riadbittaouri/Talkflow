@@ -1,7 +1,7 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talkflow - Optimisez vos équipes</title>
@@ -207,83 +207,116 @@
     </section>
 
     <!-- Modal for Student Access -->
-    <div class="modal fade" id="etudiantModal" tabindex="-1" aria-labelledby="etudiantModalLabel" aria-hidden="true">
+    <div class="modal fade" id="etudiantModal" tabindex="-1" aria-labelledby="enterCodeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="etudiantModalLabel">Accès étudiant</h5>
+                    <h5 class="modal-title" id="enterCodeModalLabel">Entrer le code du test</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <!-- Combined Form for Code and Student Data -->
+                    <form method="POST" action="{% url 'enter_code' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Class Code Input -->
                         <div class="mb-3">
                             <label for="classCode" class="form-label">Entrer le code du test</label>
-                            <input type="text" class="form-control" id="studentName" placeholder="Entrez le code">
+                            <input type="text" class="form-control" name="code" id="classCode" placeholder="Entrez le code"
+                                value="{% if request.POST.code %}{{ request.POST.code }}{% endif %}">
                         </div>
-                        <button type="button" class="btn btn-primary">Aller vers le test</button>
+                        
+                        {% if student_form %}
+                            <!-- Student Information Form -->
+                            <div class="mb-3">
+                                {{ student_form.as_p }} <!-- Render student form fields here -->
+                            </div>
+                        {% endif %}
+    
+                        <!-- Submit Button for Both Forms -->
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
+                    
+                    {% if error %}
+                        <div class="alert alert-danger mt-3">{{ error }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    
+    <!-- Button to trigger the modal (Inside the existing Etudiant section) -->
+    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#etudiantModal">Entrer le code</a>
+
+
+    <!-- Sign Up Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-messages"></div> <!-- Error messages will appear here -->
+                    <form id="signupForm" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="signupName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Sign Up</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    
 
-    <!-- Modal for Sign Up -->
-    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-           <div class="modal-header">
-               <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-           </div>
-           <div class="modal-body">
-               <form>
-                  <div class="mb-3">
-                      <label for="signupName" class="form-label">Full Name</label>
-                      <input type="text" class="form-control" id="signupName" placeholder="Enter your full name">
-                  </div>
-                  <div class="mb-3">
-                      <label for="signupEmail" class="form-label">Email address</label>
-                      <input type="email" class="form-control" id="signupEmail" placeholder="name@example.com">
-                  </div>
-                  <div class="mb-3">
-                      <label for="signupPassword" class="form-label">Password</label>
-                      <input type="password" class="form-control" id="signupPassword" placeholder="Password">
-                  </div>
-                  <div class="mb-3">
-                      <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
-                      <input type="password" class="form-control" id="signupConfirmPassword" placeholder="Confirm Password">
-                  </div>
-                  <button type="submit" class="btn btn-primary w-100">Sign Up</button>
-               </form>
-           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Modal for Login -->
+    <!-- Login Modal -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-           <div class="modal-header">
-               <h5 class="modal-title" id="loginModalLabel">Login</h5>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-           </div>
-           <div class="modal-body">
-               <form>
-                  <div class="mb-3">
-                      <label for="loginEmail" class="form-label">Email address</label>
-                      <input type="email" class="form-control" id="loginEmail" placeholder="name@example.com">
-                  </div>
-                  <div class="mb-3">
-                      <label for="loginPassword" class="form-label">Password</label>
-                      <input type="password" class="form-control" id="loginPassword" placeholder="Password">
-                  </div>
-                  <button type="submit" class="btn btn-primary w-100">Login</button>
-               </form>
-           </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-messages"></div> <!-- Error messages will appear here -->
+                    <form id="loginForm" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
+    
+
 
     <!-- Pied de page -->
     <footer>
@@ -301,4 +334,53 @@
       AOS.init();
     </script>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function getCSRFToken() {
+            let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]");
+            return csrfToken ? csrfToken.value : "";
+        }
+
+        function handleFormSubmit(formId, url) {
+            const form = document.getElementById(formId);
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();  // Prevent default form submission
+
+                let formData = new FormData(form);
+                let csrfToken = getCSRFToken();
+
+                fetch(url, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url; // Redirect on success
+                    } else {
+                        let errorDiv = document.querySelector(`#${formId} .error-messages`);
+                        errorDiv.innerHTML = "";  // Clear previous errors
+                        for (let key in data.errors) {
+                            let errorText = document.createElement("p");
+                            errorText.style.color = "red";
+                            errorText.textContent = `${key}: ${data.errors[key]}`;
+                            errorDiv.appendChild(errorText);
+                        }
+                    }
+                })
+                .catch(error => console.log("Error:", error));
+            });
+        }
+
+        // Attach event listeners for signup and login forms
+        handleFormSubmit("signupForm", "{% url 'signup' %}");
+        handleFormSubmit("loginForm", "{% url 'login' %}");
+    });
+</script>
+
+
 </html>

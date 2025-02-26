@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS to limit the width of the question cards */
+        .question-container {
+            max-width: 75%;
+            margin: 0 auto; /* Center the container */
+        }
+
+        /* Custom CSS for a larger button */
+        .btn-custom {
+            padding: 10px 20px; /* Increase padding for a larger button */
+            font-size: 16px; /* Increase font size */
+        }
+
+        /* Add space between the button and the footer */
+        .button-container {
+            margin-bottom: 50px; /* Add space below the button */
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #343a40; /* Dark background */
+            color: white; /* White text */
+            padding: 20px 0; /* Padding for the footer */
+            text-align: center; /* Center-align text */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Personality Test</h1>
+        <p class="text-center">Please answer the following questions:</p>
+
+        <form id="testForm">
+            {% csrf_token %}
+            <div id="questions" class="question-container">
+                {% for question in questions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Question {{ forloop.counter }}</h5>
+                            <p class="card-text">{{ question }}</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question{{ forloop.counter }}" id="question{{ forloop.counter }}_yes" value="yes" required>
+                                <label class="form-check-label" for="question{{ forloop.counter }}_yes">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question{{ forloop.counter }}" id="question{{ forloop.counter }}_no" value="no" required>
+                                <label class="form-check-label" for="question{{ forloop.counter }}_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <!-- Larger submit button with space below -->
+            <div class="text-center mt-4 button-container">
+                <button type="submit" class="btn btn-primary btn-custom">Submit Test</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Your Company. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("testForm");
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();  // Prevent default form submission
+
+                const answers = {};
+
+                // Collect answers from the form
+                const questionCount = { questions,length };  // Get the number of questions
+                for (let i = 1; i <= questionCount; i++) {
+                    const selectedAnswer = document.querySelector(`input[name="question${i}"]:checked`);
+                    answers[`question${i}`] = selectedAnswer ? selectedAnswer.value : null;
+                }
+
+                // Send answers to the server
+                fetch("{% url 'take_test' %}", {
+                    method: "POST",
+                    body: JSON.stringify({ answers: answers }),
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = "{% url 'home' %}";  // Redirect to home or another page
+                    } else {
+                        alert("Error: " + JSON.stringify(data.errors));
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+    </script>
+</body>
+</html>
