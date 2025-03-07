@@ -10,12 +10,12 @@ import json
 
 # Définir les groupes et leurs caractéristiques
 groups = {
-    'empathetic': ['Warm', 'Compassionate', 'Sensitive'],
-    'work lover': ['Logic', 'Responsible', 'Organised'],
-    'persevering': ['Conscientious', 'Observant', 'Dedicated'],
-    'promoter': ['Calm', 'Introspective', 'Imaginative'],
-    'dreamer': ['Adaptable', 'Resourceful', 'Charming'],
-    'rebel': ['Creative', 'Spontaneous', 'Playful']
+    'empathetic': ['Warm', 'Compassionate', 'Sensitive'], #5
+    'work lover': ['Logic', 'Responsible', 'Organised'], #1
+    'persevering': ['Conscientious', 'Observant', 'Dedicated'], #3 
+    'promoter': ['Calm', 'Introspective', 'Imaginative'], #2
+    'dreamer': ['Adaptable', 'Resourceful', 'Charming'], #4
+    'rebel': ['Creative', 'Spontaneous', 'Playful'] #6
 }
 
 
@@ -163,33 +163,31 @@ def randomize_characteristics():
     random.shuffle(all_characteristics)
     return all_characteristics
 
-def personality_test(request): 
-    """Affiche le test de personnalité et gère les soumissions."""
-    if request.method == "GET":
-        # Mélanger les caractéristiques pour l'affichage
-        characteristics = randomize_characteristics()
-        return render(request, 'personality_test.html', {'characteristics': characteristics})
-
-    elif request.method == "POST":
-        # Récupérer les données de la requête
+def personality_test(request):
+    if request.method == "POST":
         selected_characteristics = request.POST.getlist('characteristics', [])
-        
-        # Calculer les scores
         scores = {group: 0 for group in groups}
         for group, characteristics in groups.items():
             for characteristic in characteristics:
                 if characteristic in selected_characteristics:
                     scores[group] += 1
 
-        # Trier les scores par ordre décroissant
-        sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+        max_score = max(scores.values())
+        matching_groups = [group for group, score in scores.items() if score == max_score]
+        result_group = random.choice(matching_groups) if matching_groups else None
 
-        # Retourner le fichier HTML avec les scores
-        return render(request, 'result.html', {"success": True, "scores": sorted_scores})
-    
-    return JsonResponse({"success": False, "message": "Invalid request method."})
+        return render(request, 'result.html', {'result_group': scores})
+
+    characteristics = randomize_characteristics()
+    return render(request, 'personality_test.html', {'characteristics': characteristics})
 
 
+def result(request):
+    # Exemple de contexte à passer au template
+    context = {
+        'message': 'Voici votre résultat personnalisé.',
+    }
+    return render(request, 'result.html', context)
 
 # def take_test(request):
 #     questions = [
