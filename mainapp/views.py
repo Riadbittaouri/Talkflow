@@ -95,31 +95,31 @@ def generate_class_code(request, classroom_id):
     classroom.save()
     return JsonResponse({"code": code})  # Return the generated code as JSON
 
-def enter_class_code(request):
-    if request.method == "POST":
-        code = request.POST.get("code")
-        classroom = Classroom.objects.filter(code=code).first()
+# def enter_class_code(request):
+#     if request.method == "POST":
+#         code = request.POST.get("code")
+#         classroom = Classroom.objects.filter(code=code).first()
         
-        if classroom:
-            # Class code is valid, handle student form
-            student_form = StudentForm(request.POST)  # Pass all POST data to the form
+#         if classroom:
+#             # Class code is valid, handle student form
+#             student_form = StudentForm(request.POST)  # Pass all POST data to the form
             
-            if student_form.is_valid():
-                student = student_form.save(commit=False)
-                student.classroom = classroom
-                student.save()
-                return redirect('take_test')  # Redirect to the test page
-            else:
-                # If the student form is not valid, re-render the page with error messages
-                return render(request, 'home.html', {'student_form': student_form, 'error': 'Invalid student information.'})
-        else:
-            # Invalid class code
-            return render(request, 'home.html', {'error': 'Invalid class code.'})
+#             if student_form.is_valid():
+#                 student = student_form.save(commit=False)
+#                 student.classroom = classroom
+#                 student.save()
+#                 return redirect('take_test')  # Redirect to the test page
+#             else:
+#                 # If the student form is not valid, re-render the page with error messages
+#                 return render(request, 'home.html', {'student_form': student_form, 'error': 'Invalid student information.'})
+#         else:
+#             # Invalid class code
+#             return render(request, 'home.html', {'error': 'Invalid class code.'})
     
-    else:
-        # For GET request, just show the empty form
-        student_form = StudentForm()  # Empty student form
-        return render(request, 'home.html', {'student_form': student_form})
+#     else:
+#         # For GET request, just show the empty form
+#         student_form = StudentForm()  # Empty student form
+#         return render(request, 'home.html', {'student_form': student_form})
 
 
 
@@ -146,7 +146,9 @@ def enter_class_code(request):
                 student.classroom = classroom
                 student.save()
                 request.session['student_id'] = student.id  # Set student ID in session
-                return redirect('personality_test')  # Utiliser le nom correct
+                response = redirect('personality_test')  # Redirect to personality test
+                response.set_cookie('student_id', student.id)  # Set student ID in cookie
+                return response
             else:
                 return render(request, 'home.html', {'student_form': student_form, 'error': 'Invalid student information.'})
         else:

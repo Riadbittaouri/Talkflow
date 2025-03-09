@@ -9,7 +9,7 @@
 <body class="bg-light">
   <div class="container py-5">
     <h1 class="text-center mb-4">Personality Test</h1>
-    <form class="card p-4 shadow-sm" action="result.html" method="GET" id="personalityForm">
+    <form class="card p-4 shadow-sm" action="result.html" method="GET" id="personalityForm"> 
         <div class="row row-cols-2 row-cols-md-3 g-3">
         <!-- Add Bootstrap styling to checkboxes -->
         <div class="col">
@@ -137,67 +137,78 @@
   <script>
     let clickedCheckboxes = [];
     let matchedGroups = [];
-
+  
     const groups = {
-      'empathetic': ['Warm', 'Compassionate', 'Sensitive'],
-      'work lover': ['Logic', 'Responsible', 'Organised'],
-      'persevering': ['Conscientious', 'Observant', 'Dedicated'],
-      'promoter': ['Calm', 'Introspective', 'Imaginative'],
-      'dreamer': ['Adaptable', 'Resourceful', 'Charming'],
-      'rebel': ['Creative', 'Spontaneous', 'Playful']
+      empathetic: ["Warm", "Compassionate", "Sensitive"],
+      "work lover": ["Logic", "Responsible", "Organised"],
+      persevering: ["Conscientious", "Observant", "Dedicated"],
+      promoter: ["Calm", "Introspective", "Imaginative"],
+      dreamer: ["Adaptable", "Resourceful", "Charming"],
+      rebel: ["Creative", "Spontaneous", "Playful"],
     };
-
+  
+    // Met à jour les cases cochées dans l'ordre
     function updateOrder(checkbox) {
       if (checkbox.checked) {
         clickedCheckboxes.push(checkbox.value);
       } else {
-        clickedCheckboxes = clickedCheckboxes.filter(value => value !== checkbox.value);
+        clickedCheckboxes = clickedCheckboxes.filter(
+          (value) => value !== checkbox.value
+        );
       }
-      document.getElementById('order').textContent = clickedCheckboxes.join(', ');
+      document.getElementById("order").textContent = clickedCheckboxes.join(", ");
+      updateResultDisplay();
     }
-
-    function findMatchingGroup(selectedValues) {
+  
+    // Vérifie et met à jour les groupes correspondants
+    function updateResultDisplay() {
+      const resultElement = document.getElementById("result");
+  
+      // On parcourt chaque groupe
       for (const [group, characteristics] of Object.entries(groups)) {
-        if (characteristics.every(char => selectedValues.includes(char))) {
-          return group;
+        // Vérifie si tous les traits du groupe sont cochés
+        const allMatched = characteristics.every((trait) =>
+          clickedCheckboxes.includes(trait)
+        );
+  
+        // Ajoute le groupe seulement s'il n'est pas déjà dans la liste et que tous ses traits sont cochés
+        if (allMatched && !matchedGroups.includes(group)) {
+          matchedGroups.push(group);
         }
       }
-      return null;
+  
+      // Affiche les groupes correspondants sans changer leur ordre
+      resultElement.textContent = matchedGroups.join(", ");
     }
-
-    function updateResultDisplay() {
-      const resultElement = document.getElementById('result');
-      resultElement.textContent = matchedGroups.join(', ');
-    }
-
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-      checkbox.addEventListener('click', () => updateOrder(checkbox));
-    });
-
-    document.getElementById('clearButton').addEventListener('click', () => {
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+  
+    // Réinitialise les sélections
+    document.getElementById("clearButton").addEventListener("click", () => {
+      document
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((checkbox) => (checkbox.checked = false));
       clickedCheckboxes = [];
       matchedGroups = [];
-      document.getElementById('order').textContent = '';
-      document.getElementById('result').textContent = '';
+      document.getElementById("order").textContent = "";
+      document.getElementById("result").textContent = "";
     });
-
-    document.getElementById('submitButton').addEventListener('click', () => {
-  matchedGroups = [];
-  const chunkSize = 3;
-  for (let i = 0; i < clickedCheckboxes.length; i += chunkSize) {
-    const group = findMatchingGroup(clickedCheckboxes.slice(i, i + chunkSize));
-    if (group && !matchedGroups.includes(group)) {
-      matchedGroups.push(group);
-    }
-  }
-  // Remplir le champ caché avec les résultats
-  document.getElementById('hiddenResult').value = matchedGroups.join(', ');
-
-  // Soumettre le formulaire
-  document.getElementById('personalityForm').submit();
-});
-
+  
+    // Soumet le formulaire et montre les résultats finaux
+    document.getElementById("submitButton").addEventListener("click", () => {
+      document.getElementById("hiddenResult").value = matchedGroups.join(", ");
+      document.getElementById("personalityForm").submit();
+    });
+  
+    // Ajoute des écouteurs aux cases à cocher
+    document
+      .querySelectorAll('input[type="checkbox"]')
+      .forEach((checkbox) =>
+        checkbox.addEventListener("click", () => updateOrder(checkbox))
+      );
   </script>
+  
+  
+  
+  
+  
 </body>
 </html>
