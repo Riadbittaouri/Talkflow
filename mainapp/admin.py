@@ -11,3 +11,5 @@ class TeacherAdmin(admin.ModelAdmin):
 
 admin.site.register(Classroom)
 admin.site.register(Student)
+admin.site.register(TestResult)
+admin.site.register(Group_student)

@@ -32,11 +32,13 @@ class TeacherLoginForm(AuthenticationForm):
 class ClassroomForm(forms.ModelForm):
     class Meta:
         model = Classroom
-        fields = ["name", "students_count"]  # Add students_count to the form fields
+        fields = ["name", "students_count", "group_size"]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter class name"}),
             "students_count": forms.NumberInput(attrs={"class": "form-control", "min": "0", "value": "0"}),
+            "group_size": forms.NumberInput(attrs={"class": "form-control", "min": "1", "value": "4"}),  # Ensure it's editable
         }
+
 
 
 

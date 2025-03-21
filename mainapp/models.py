@@ -36,6 +36,7 @@ class Classroom(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)  # Link the custom Teacher model
     name = models.CharField(max_length=255)  # Class name
     students_count = models.PositiveIntegerField(default=0)  # Number of students
+    group_size = models.PositiveIntegerField(default=4,null=True,blank=True)
     code = models.CharField(max_length=10, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp
 
@@ -47,7 +48,7 @@ class Student(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    score = models.PositiveIntegerField(default=0)
+    score = models.CharField(max_length=255, blank=True, null=True)
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -56,7 +57,15 @@ class TestResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     test_date = models.DateTimeField(auto_now_add=True)
     answers = models.JSONField(default=dict)  # Store answers as a JSON object
+    dominant_trait = models.CharField(max_length=50, blank=True, null=True)  # New field for dominant trait
 
     def __str__(self):
         return f"{self.student.first_name} {self.student.last_name} - {self.test_date}"
 
+class Group_student(models.Model):
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="groups")
+    name = models.CharField(max_length=255)  # Group name
+    students = models.ManyToManyField(Student, related_name="groups")
+    
+    def __str__(self):
+        return f"Group {self.name} - Classroom: {self.classroom.name}"

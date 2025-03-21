@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.http import JsonResponse,Http404
+from django.http import JsonResponse,Http404,HttpResponse
 from .forms import TeacherSignupForm, TeacherLoginForm,ClassroomForm,StudentForm
 from django.contrib.auth.decorators import login_required
-from .models import Classroom, Student,TestResult
+from .models import Classroom, Student,TestResult,Group_student
+from math import ceil
 import random
 import string
 import json
@@ -69,11 +70,25 @@ def dashboard(request):
         if form.is_valid():
             # Create and save the classroom instance
             classroom = form.save(commit=False)
-            # You can manually set the number of students if it's passed in the form
-            classroom.students_count = form.cleaned_data.get('students_count', 0)
-            classroom.teacher = request.user  # Make sure the teacher is set correctly
+            classroom.teacher = request.user  # Assign the teacher
             classroom.save()
-            return redirect('dashboard')  # Redirect back to the dashboard page
+
+            # Calculate the number of groups needed
+            grp_size = classroom.group_size
+            total_students = classroom.students_count
+            num_groups = ceil(total_students/grp_size)
+            print(grp_size,num_groups)
+            print("Received group_size:", request.POST.get("group_size"))  # Debugging
+
+            # Create empty groups
+            for i in range(1, num_groups + 1):
+               grp = Group_student(
+                   classroom=classroom,
+                   name=f"Group {i}"
+                   
+               )
+               grp.save()
+            return redirect("dashboard")
 
     else:
         form = ClassroomForm()
@@ -86,8 +101,7 @@ def dashboard(request):
 
 
 
-# For teacher to generate the code for each class
-
+@login_required
 def generate_class_code(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))  # Generate 10-character code
@@ -95,36 +109,32 @@ def generate_class_code(request, classroom_id):
     classroom.save()
     return JsonResponse({"code": code})  # Return the generated code as JSON
 
+
 def enter_class_code(request):
     if request.method == "POST":
         code = request.POST.get("code")
         classroom = Classroom.objects.filter(code=code).first()
         
         if classroom:
-            # Class code is valid, handle student form
-            student_form = StudentForm(request.POST)  # Pass all POST data to the form
-            
+            student_form = StudentForm(request.POST)
             if student_form.is_valid():
                 student = student_form.save(commit=False)
                 student.classroom = classroom
                 student.save()
-                return redirect('take_test')  # Redirect to the test page
+                request.session['student_id'] = student.id  # Set student ID in session
+                return redirect('personality_test')  # Redirect to the personality test page
             else:
-                # If the student form is not valid, re-render the page with error messages
                 return render(request, 'home.html', {'student_form': student_form, 'error': 'Invalid student information.'})
         else:
-            # Invalid class code
             return render(request, 'home.html', {'error': 'Invalid class code.'})
     
     else:
-        # For GET request, just show the empty form
-        student_form = StudentForm()  # Empty student form
+        student_form = StudentForm()
         return render(request, 'home.html', {'student_form': student_form})
 
 
 
-
-
+@login_required
 # Teacher viewing list of students and their results
 def view_students_results(request, classroom_id):
     classroom = get_object_or_404(Classroom, id=classroom_id)
@@ -146,7 +156,7 @@ def enter_class_code(request):
                 student.classroom = classroom
                 student.save()
                 request.session['student_id'] = student.id  # Set student ID in session
-                return redirect('personality_test')  # Utiliser le nom correct
+                return redirect('personality_test')  # Redirect to the personality test page
             else:
                 return render(request, 'home.html', {'student_form': student_form, 'error': 'Invalid student information.'})
         else:
@@ -173,8 +183,10 @@ def personality_test(request):
                     scores[group] += 1
 
         max_score = max(scores.values())
+        print(max_score)
         matching_groups = [group for group, score in scores.items() if score == max_score]
         result_group = random.choice(matching_groups) if matching_groups else None
+        print(result_group)
 
         return render(request, 'result.html', {'result_group': scores})
 
@@ -183,11 +195,82 @@ def personality_test(request):
 
 
 def result(request):
-    # Exemple de contexte à passer au template
+    # Retrieve the result from the URL parameters
+    result = request.GET.get('result', '')
+    
+    # Pass the result to the template
     context = {
-        'message': 'Voici votre résultat personnalisé.',
+        'result': result,
     }
     return render(request, 'result.html', context)
+
+
+
+
+
+
+def submit_result(request):
+    if request.method == 'POST':
+        # Get the student ID from the session
+        student_id = request.session.get('student_id')
+        if not student_id:
+            return HttpResponse("Student not found. Please start the test again.", status=400)
+        
+        # Fetch the student instance
+        try:
+            student = Student.objects.get(id=student_id)
+        except Student.DoesNotExist:
+            return HttpResponse("Student not found. Please start the test again.", status=400)
+        
+        classroom = student.classroom
+        # Get the result (selected characteristics) from the form
+        result = request.POST.get('result', '')
+        if not result:
+            return HttpResponse("No result provided.", status=400)
+        
+        # Convert the result into a JSON object
+        selected_characteristics = result.split(', ')
+        answers = {"selected_characteristics": selected_characteristics}
+        
+        # Extract the dominant trait (the first characteristic)
+        dominant_trait = selected_characteristics[0] if selected_characteristics else None
+        
+        if dominant_trait:
+            # Update the student's score with the dominant trait
+            student.score = dominant_trait
+            student.save()
+
+        # Create a TestResult instance with the dominant trait
+        TestResult.objects.create(
+            student=student,
+            answers=answers,
+            dominant_trait=dominant_trait
+        )
+        
+        # **Assign student to a group where the dominant trait is not present**
+        assigned_group = None
+        available_groups = classroom.groups.all()  # Get all groups in the classroom
+
+        for group in available_groups:
+            # Get dominant traits of students already in the group
+            group_traits = set(group.students.values_list("score", flat=True))
+            
+            if dominant_trait not in group_traits:  
+                group.students.add(student)
+                assigned_group = group
+                break  # Stop when we find a suitable group
+
+        # If all groups have the same dominant trait, assign the student to the one with the least members
+        if not assigned_group:
+            smallest_group = min(available_groups, key=lambda g: g.students.count(), default=None)
+            if smallest_group:
+                smallest_group.students.add(student)
+
+
+        # Redirect to the result page with the result as a URL parameter
+        return redirect(f'/personality-test/result/?result={result}')
+    
+    return HttpResponse("Invalid request method.", status=400)
 
 # def take_test(request):
 #     questions = [

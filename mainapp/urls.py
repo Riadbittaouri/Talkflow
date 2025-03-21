@@ -13,6 +13,7 @@ urlpatterns = [
     path('classroom/<int:classroom_id>/view_students/', views.view_students_results, name='view_students_results'),
     # path('take-test/', views.take_test, name='take_test'),  # Ensure this is correctly mapped
     path('personality-test/', views.personality_test, name='personality_test'),
-    path('personality-test/result.html', views.result, name='result'),
+    path('personality-test/result/', views.result, name='result'),
+    path('submit-result/', views.submit_result, name='submit_result'),
     
 ]
