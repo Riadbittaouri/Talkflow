@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
-from django import forms
-from .models import *
+from .models import Classroom, Student
 
 User = get_user_model()
 
@@ -18,16 +17,12 @@ class TeacherSignupForm(forms.ModelForm):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
-
         if password != confirm_password:
             self.add_error("confirm_password", "Passwords do not match")
-
         return cleaned_data
 
 class TeacherLoginForm(AuthenticationForm):
-    username = forms.EmailField(label="Email")  # Override default username field with email
-
-
+    username = forms.EmailField(label="Email")
 
 class ClassroomForm(forms.ModelForm):
     class Meta:
@@ -36,11 +31,8 @@ class ClassroomForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter class name"}),
             "students_count": forms.NumberInput(attrs={"class": "form-control", "min": "0", "value": "0"}),
-            "group_size": forms.NumberInput(attrs={"class": "form-control", "min": "1", "value": "4"}),  # Ensure it's editable
+            "group_size": forms.NumberInput(attrs={"class": "form-control", "min": "1", "value": "4"}),
         }
-
-
-
 
 class StudentForm(forms.ModelForm):
     class Meta:

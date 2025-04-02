@@ -29,21 +29,18 @@ class Teacher(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
-
 
 class Classroom(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)  # Link the custom Teacher model
     name = models.CharField(max_length=255)  # Class name
     students_count = models.PositiveIntegerField(default=0)  # Number of students
-    group_size = models.PositiveIntegerField(default=4,null=True,blank=True)
+    group_size = models.PositiveIntegerField(default=4, null=True, blank=True)
     code = models.CharField(max_length=10, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp
 
     def __str__(self):
         return self.name
 
-    
 class Student(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255)
@@ -57,7 +54,7 @@ class TestResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     test_date = models.DateTimeField(auto_now_add=True)
     answers = models.JSONField(default=dict)  # Store answers as a JSON object
-    dominant_trait = models.CharField(max_length=50, blank=True, null=True)  # New field for dominant trait
+    dominant_trait = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f"{self.student.first_name} {self.student.last_name} - {self.test_date}"
