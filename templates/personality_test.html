@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Personality Test</title>
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="text-center mb-4">Personality Test</h1>
+    <form class="card p-4 shadow-sm" action="{% url 'submit_result' %}" method="POST" id="personalityForm">
+      {% csrf_token %}
+      <div class="row row-cols-2 row-cols-md-3 g-3">
+        <!-- Dynamically updated checkboxes -->
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox1" value="Warm">
+            <label class="form-check-label" for="checkbox1">Warm, Chaleureux, دافئ</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox2" value="Compassionate">
+            <label class="form-check-label" for="checkbox2">Compassionate, Compatissant, متعاطف</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox3" value="Sensitive">
+            <label class="form-check-label" for="checkbox3">Sensitive, Sensible, حساس</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox4" value="Logical">
+            <label class="form-check-label" for="checkbox4">Logical, Logique, منطقي</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox5" value="Responsible">
+            <label class="form-check-label" for="checkbox5">Responsible, Responsable, مسؤول</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox6" value="Organized">
+            <label class="form-check-label" for="checkbox6">Organized, Organisé, منظم</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox7" value="Conscientious">
+            <label class="form-check-label" for="checkbox7">Conscientious, Consciencieux, ملتزم</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox8" value="Observant">
+            <label class="form-check-label" for="checkbox8">Observant, Observateur, ملاحظ</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox9" value="Committed">
+            <label class="form-check-label" for="checkbox9">Committed, Engagé, ملتزم</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox10" value="Adaptable">
+            <label class="form-check-label" for="checkbox10">Adaptable, Adaptable, قابل للتكيف</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox11" value="Charismatic">
+            <label class="form-check-label" for="checkbox11">Charismatic, Charmeur , كاريزمي</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox12" value="Action-oriented">
+            <label class="form-check-label" for="checkbox12">Action-oriented, Orienté vers l'action, موجه نحو العمل</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox13" value="Calm">
+            <label class="form-check-label" for="checkbox13">Calm, Calme, هادئ</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox14" value="Reflective">
+            <label class="form-check-label" for="checkbox14">Reflective, Réfléchi, متأمل</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox15" value="Imaginative">
+            <label class="form-check-label" for="checkbox15">Imaginative, Imaginatif, خيالي</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox16" value="Creative">
+            <label class="form-check-label" for="checkbox16">Creative, Créatif, مبدع</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox17" value="Spontaneous">
+            <label class="form-check-label" for="checkbox17">Spontaneous, Spontané, عفوي</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox18" value="Playful">
+            <label class="form-check-label" for="checkbox18">Playful, Ludique, مرح</label>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" name="result" id="hiddenResult">
+    </form>
+
+    <div class="mt-4">
+      <p><strong>Ordre des clics :</strong> <span id="order" class="text-primary"></span></p>
+      <p><strong>Résultat :</strong> <span id="result" class="text-success"></span></p>
+      <div class="d-flex justify-content-center mt-3">
+        <button id="clearButton" class="btn btn-danger me-3">Clear Selection</button>
+        <button id="submitButton" class="btn btn-success">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const groups = {
+    'harmonizer': ['Warm', 'Compassionate', 'Sensitive'],
+    'thinker': ['Logical', 'Responsible', 'Organized'],
+    'persister': ['Conscientious', 'Observant', 'Committed'],
+    'promoter': ['Adaptable', 'Charismatic', 'Action-oriented'],
+    'imaginer': ['Calm', 'Reflective', 'Imaginative'],
+    'rebel': ['Creative', 'Spontaneous', 'Playful']
+  };
+
+  let clickedCheckboxes = [];
+    let matchedGroups = [];
+  
+  
+    // Met à jour les cases cochées dans l'ordre
+    function updateOrder(checkbox) {
+      if (checkbox.checked) {
+        clickedCheckboxes.push(checkbox.value);
+      } else {
+        clickedCheckboxes = clickedCheckboxes.filter(
+          (value) => value !== checkbox.value
+        );
+      }
+      document.getElementById("order").textContent = clickedCheckboxes.join(", ");
+      updateResultDisplay();
+    }
+  
+    // Vérifie et met à jour les groupes correspondants
+    function updateResultDisplay() {
+      const resultElement = document.getElementById("result");
+  
+      // On parcourt chaque groupe
+      for (const [group, characteristics] of Object.entries(groups)) {
+        // Vérifie si tous les traits du groupe sont cochés
+        const allMatched = characteristics.every((trait) =>
+          clickedCheckboxes.includes(trait)
+        );
+  
+        // Ajoute le groupe seulement s'il n'est pas déjà dans la liste et que tous ses traits sont cochés
+        if (allMatched && !matchedGroups.includes(group)) {
+          matchedGroups.push(group);
+        }
+      }
+  
+      // Affiche les groupes correspondants sans changer leur ordre
+      resultElement.textContent = matchedGroups.join(", ");
+    }
+  
+    // Réinitialise les sélections
+    document.getElementById("clearButton").addEventListener("click", () => {
+      document
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((checkbox) => (checkbox.checked = false));
+      clickedCheckboxes = [];
+      matchedGroups = [];
+      document.getElementById("order").textContent = "";
+      document.getElementById("result").textContent = "";
+    });
+  
+    // Soumet le formulaire et montre les résultats finaux
+    document.getElementById("submitButton").addEventListener("click", () => {
+      document.getElementById("hiddenResult").value = matchedGroups.join(", ");
+      document.getElementById("personalityForm").submit();
+    });
+  
+    // Ajoute des écouteurs aux cases à cocher
+    document
+      .querySelectorAll('input[type="checkbox"]')
+      .forEach((checkbox) =>
+        checkbox.addEventListener("click", () => updateOrder(checkbox))
+      );
+</script>
+</body>
+</html>
