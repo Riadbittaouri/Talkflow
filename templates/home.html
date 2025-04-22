@@ -1,0 +1,386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talkflow - Optimisez vos équipes</title>
+
+    <!-- Bootstrap CSS (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        /* Styles personnalisés */
+        /* Section Hero */
+        .hero {
+            background: url('https://via.placeholder.com/1500x500?text=Talkflow+Hero') center/cover no-repeat;
+            color: #fff;
+            padding: 8rem 1rem;
+            text-align: center;
+            position: relative;
+        }
+        .hero::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        /* Titres de sections */
+        .section-title {
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        /* Icônes des fonctionnalités */
+        .feature-icon {
+            font-size: 3rem;
+            color: #0d6efd;
+        }
+        /* Témoignages */
+        .testimonial {
+            background-color: #f8f9fa;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin: 1rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        /* Pied de page */
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+        /* Animation au survol des boutons */
+        .btn:hover {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Talkflow</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <!-- Ouvre la modale pour l'accès étudiant -->
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#etudiantModal">Etudiant</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Ouvre la modale pour le Sign Up -->
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#signupModal">Sign in</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Ouvre la modale pour le Login -->
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section Hero avec animation -->
+    <section class="hero">
+        <div class="hero-content animate__animated animate__fadeInDown">
+            <h1>Optimisez vos équipes</h1>
+            <p class="lead">Créez des groupes de travail efficaces grâce à Talkflow</p>
+            <a href="#about" class="btn btn-primary mt-3">En savoir plus</a>
+        </div>
+    </section>
+
+    <!-- Section À propos -->
+    <section id="about" class="container my-5" data-aos="fade-up">
+        <h2 class="section-title">À propos de Talkflow</h2>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <p class="lead text-center">
+                    Découvrez Talkflow, l’outil révolutionnaire qui propulse vos équipes vers l’excellence !<br>
+                    Grâce à une répartition intelligente des participants selon leurs profils, Talkflow crée des groupes de travail harmonieux et ultra-performants. Fini les blocages causés par des personnalités inadaptées : plus besoin d’avoir deux rêveurs ou deux rebelles qui freinent la dynamique !<br><br>
+                    Chaque groupe est soigneusement optimisé pour travailler de manière fluide et efficace, respectant délais et objectifs, même en période de stress. Libérez le potentiel de vos collaborateurs et transformez vos équipes en véritables moteurs de réussite avec Talkflow.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Fonctionnalités -->
+    <section class="bg-light py-5" data-aos="fade-right">
+        <div class="container">
+            <h2 class="section-title">Pourquoi choisir Talkflow&nbsp;?</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <i class="bi bi-people-fill feature-icon"></i>
+                    <h5 class="mt-3">Collaboration Optimisée</h5>
+                    <p>Regroupez les bonnes personnalités pour une synergie parfaite.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <i class="bi bi-speedometer2 feature-icon"></i>
+                    <h5 class="mt-3">Productivité Maximisée</h5>
+                    <p>Boostez l'efficacité et atteignez vos objectifs dans les délais impartis.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <i class="bi bi-chat-dots-fill feature-icon"></i>
+                    <h5 class="mt-3">Communication Fluide</h5>
+                    <p>Facilitez les échanges pour des résultats harmonieux, même sous pression.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Témoignages avec Carousel -->
+    <section class="container my-5" data-aos="fade-up">
+        <h2 class="section-title">Témoignages</h2>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="testimonial">
+                        <p>"Talkflow a transformé notre façon de travailler. Nos équipes sont plus cohérentes et productives."</p>
+                        <small>- Jean, Manager</small>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial">
+                        <p>"Une solution innovante qui nous a permis de mieux répartir les talents au sein de notre entreprise."</p>
+                        <small>- Marie, Directrice RH</small>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial">
+                        <p>"La communication dans nos groupes s'est nettement améliorée. Je recommande Talkflow sans hésitation !"</p>
+                        <small>- Pierre, Chef de Projet</small>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Section Appel à l'action -->
+    <section class="py-5 bg-primary text-white" data-aos="zoom-in">
+        <div class="container text-center">
+            <h2>Prêt à transformer vos équipes?</h2>
+            <p class="lead">Rejoignez Talkflow dès aujourd'hui et donnez un nouvel élan à votre entreprise.</p>
+            <a href="#contact" class="btn btn-light mt-3">Contactez-nous</a>
+        </div>
+    </section>
+
+    <!-- Section Contact avec coordonnées -->
+    <section id="contact" class="container my-5" data-aos="fade-up">
+        <h2 class="section-title">Contactez-nous</h2>
+        <div class="row">
+            <div class="col-md-6 offset-md-3 text-center">
+                <p class="lead"><i class="bi bi-whatsapp"></i> WhatsApp : (+212) 622458770</p>
+                <p class="lead"><i class="bi bi-facebook"></i> Facebook : @talkflow</p>
+                <p class="lead"><i class="bi bi-instagram"></i> Instagram : @talkflow</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for Student Access -->
+    <div class="modal fade" id="etudiantModal" tabindex="-1" aria-labelledby="enterCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="enterCodeModalLabel">Entrer le code du test</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Combined Form for Code and Student Data -->
+                    <form method="POST" action="{% url 'enter_code' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Class Code Input -->
+                        <div class="mb-3">
+                            <label for="classCode" class="form-label">Entrer le code du test</label>
+                            <input type="text" class="form-control" name="code" id="classCode" placeholder="Entrez le code"
+                                value="{% if request.POST.code %}{{ request.POST.code }}{% endif %}">
+                        </div>
+                        
+                        {% if student_form %}
+                            <!-- Student Information Form -->
+                            <div class="mb-3">
+                                {{ student_form.as_p }} <!-- Render student form fields here -->
+                            </div>
+                        {% endif %}
+    
+                        <!-- Submit Button for Both Forms -->
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
+                    
+                    {% if error %}
+                        <div class="alert alert-danger mt-3">{{ error }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    
+    <!-- Button to trigger the modal (Inside the existing Etudiant section) -->
+    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#etudiantModal">Entrer le code</a>
+
+
+    <!-- Sign Up Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-messages"></div> <!-- Error messages will appear here -->
+                    <form id="signupForm" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="signupName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-messages"></div> <!-- Error messages will appear here -->
+                    <form id="loginForm" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Talkflow. Tous droits réservés. | <a href="#">Contact</a> | <a href="#">Mentions légales</a></p>
+        </div>
+    </footer>
+
+    <!-- Scripts JS -->
+    <!-- Bootstrap JS (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function getCSRFToken() {
+            let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]");
+            return csrfToken ? csrfToken.value : "";
+        }
+
+        function handleFormSubmit(formId, url) {
+            const form = document.getElementById(formId);
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();  // Prevent default form submission
+
+                let formData = new FormData(form);
+                let csrfToken = getCSRFToken();
+
+                fetch(url, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url; // Redirect on success
+                    } else {
+                        let errorDiv = document.querySelector(`#${formId} .error-messages`);
+                        errorDiv.innerHTML = "";  // Clear previous errors
+                        for (let key in data.errors) {
+                            let errorText = document.createElement("p");
+                            errorText.style.color = "red";
+                            errorText.textContent = `${key}: ${data.errors[key]}`;
+                            errorDiv.appendChild(errorText);
+                        }
+                    }
+                })
+                .catch(error => console.log("Error:", error));
+            });
+        }
+
+        // Attach event listeners for signup and login forms
+        handleFormSubmit("signupForm", "{% url 'signup' %}");
+        handleFormSubmit("loginForm", "{% url 'login' %}");
+    });
+</script>
+
+
+</html>

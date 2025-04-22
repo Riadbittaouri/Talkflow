@@ -1,0 +1,15 @@
+# Secrets à ne PAS versionner
+credentials.json
+token.pickle
+.env
+
+# Fichiers Python / Django
+*.pyc
+__pycache__/
+db.sqlite3
+*.log
+
+
+# IDE / OS
+.vscode/
+.idea/

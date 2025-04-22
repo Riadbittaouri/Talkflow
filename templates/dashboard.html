@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    .logout-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+    .code-container {
+      position: relative;
+      min-width: 150px;
+      display: inline-flex; 
+      align-items: center;
+    }
+    .code-display {
+      position: absolute;
+      right: 100%;  
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      margin-right: 10px;  
+      font-weight: bold;
+      background: white;
+      padding: 2px 5px;
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Logout Button -->
+  <div class="d-flex justify-content-end p-3">
+    <a href="{% url 'logout' %}" class="logout-btn"
+       onclick="return confirm('Are you sure you want to logout?');">
+      Logout
+    </a>
+  </div>
+
+  <div class="container mt-5">
+    <h2>Welcome, {{ user.full_name }}</h2>
+    <button class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#createClassModal">
+      Create Class
+    </button>
+
+    <div class="card">
+      <div class="card-header">Your Classes</div>
+      <ul class="list-group list-group-flush">
+        {% for class in classrooms %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            {{ class.name }}
+            <small class="text-muted">
+              Created on {{ class.created_at }} | Students: {{ class.students_count }}
+            </small>
+          </div>
+          <div class="d-flex align-items-center">
+            <!-- Generate Code Button -->
+            <div class="code-container position-relative me-3">
+              <a href="#" class="btn btn-secondary btn-sm generate-code-btn"
+                 data-class-id="{{ class.id }}" data-type="frontend">
+                Generate Code
+              </a>
+              <span id="code-display-{{ class.id }}" class="code-display">&nbsp;</span>
+            </div>
+            <!-- View Students Button -->
+            <button class="btn btn-info btn-sm ms-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#studentsResultsModal{{ class.id }}">
+              View Students
+            </button>
+          </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item">You have no classes yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Students Results Modals -->
+  {% for class in classrooms %}
+  <div class="modal fade" id="studentsResultsModal{{ class.id }}" tabindex="-1"
+       aria-labelledby="studentsResultsModalLabel{{ class.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="studentsResultsModalLabel{{ class.id }}">Students and Groups</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          {% for group in class.groups.all %}
+            <h5>{{ group.name }}</h5>
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>#</th><th>Name</th><th>Email</th><th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for student in group.students.all %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ student.first_name }} {{ student.last_name }}</td>
+                  <td>{{ student.email }}</td>
+                  <td>{{ student.score }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">No students in this group.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary"
+                  id="downloadStudentsModalBtn{{ class.id }}">Download</button>
+          <button type="button" class="btn btn-outline-secondary"
+                  id="printStudentsModalBtn{{ class.id }}">Print</button>
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Create Class Modal -->
+  <div class="modal fade" id="createClassModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>Create a Class</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createClassForm" method="POST" action="{% url 'dashboard' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Class Name</label>
+              {{ form.name }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Number of Students</label>
+              {{ form.students_count }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Group Size</label>
+              {{ form.group_size }}
+            </div>
+            <div id="validationMessage" class="text-danger mb-3"></div>
+            <button type="button" class="btn btn-primary w-100" id="confirmCreateClassBtn">
+              Create Class
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Create Class Modal -->
+  <div class="modal fade" id="confirmCreateClassModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>Confirm Class Creation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="confirmCreateClassForm" method="POST" action="{% url 'dashboard' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label>Class Name</label>
+              <input type="text" id="confirmClassName" name="name" class="form-control" readonly>
+            </div>
+            <div class="mb-3">
+              <label>Number of Students</label>
+              <input type="number" id="confirmStudentsCount" name="students_count" class="form-control" readonly>
+            </div>
+            <div class="mb-3">
+              <label>Group Size</label>
+              <input type="number" id="confirmGroupSize" name="group_size" class="form-control" readonly>
+            </div>
+            <div id="confirmValidationMessage" class="text-danger mb-3"></div>
+            <button type="submit" class="btn btn-primary w-100">Confirm</button>
+            <button type="button" class="btn btn-secondary w-100 mt-2" id="modifyInfoBtn">
+              Modify Information
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    // DOM ready
+    document.addEventListener("DOMContentLoaded", function () {
+      // Generate Code buttons
+      document.querySelectorAll(".generate-code-btn").forEach(button => {
+        button.addEventListener("click", function (e) {
+          e.preventDefault();
+          const classId     = this.dataset.classId;
+          const displaySpan = document.getElementById("code-display-" + classId);
+          const url         = `/classroom/${classId}/generate_code/`;
+
+          fetch(url, {
+            method: "GET",
+            credentials: "same-origin"
+          })
+          .then(res => {
+            if (!res.ok) throw new Error("Network response was not OK");
+            return res.text();
+          })
+          .then(code => {
+            displaySpan.textContent = code;
+          })
+          .catch(err => {
+            console.error("Error generating code:", err);
+            displaySpan.textContent = "Erreur !";
+          });
+        });
+      });
+
+      // Download & Print modal content
+      function downloadContent(classId) {
+        const modal = document.getElementById("studentsResultsModal" + classId);
+        const blob  = new Blob([modal.innerHTML], { type: "text/html" });
+        const url   = URL.createObjectURL(blob);
+        const a     = document.createElement("a");
+        a.href      = url;
+        a.download  = `students_results_${classId}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      function printContent(classId) {
+        const modal = document.getElementById("studentsResultsModal" + classId);
+        const w     = window.open("", "", "width=800,height=600");
+        w.document.write("<html><body>" + modal.innerHTML + "</body></html>");
+        w.document.close();
+        w.print();
+        w.close();
+      }
+      document.querySelectorAll("[id^='downloadStudentsModalBtn']").forEach(btn => {
+        btn.addEventListener("click", () => downloadContent(btn.id.replace("downloadStudentsModalBtn","")));
+      });
+      document.querySelectorAll("[id^='printStudentsModalBtn']").forEach(btn => {
+        btn.addEventListener("click", () => printContent(btn.id.replace("printStudentsModalBtn","")));
+      });
+
+      // CSRF helper
+      function getCookie(name) {
+        let value = null;
+        document.cookie.split(";").forEach(c => {
+          const [k,v] = c.trim().split("=");
+          if (k === name) value = decodeURIComponent(v);
+        });
+        return value;
+      }
+      const csrftoken = getCookie("csrftoken");
+
+      // Create class confirmation
+      let firstClick = true;
+      document.getElementById("confirmCreateClassBtn")
+        .addEventListener("click", () => {
+          const studentsCount = +document.querySelector("input[name='students_count']").value;
+          const groupSize     = +document.querySelector("input[name='group_size']").value;
+          const valid         = studentsCount % groupSize === 0;
+          const modalData     = {
+            name: document.querySelector("input[name='name']").value,
+            studentsCount,
+            groupSize: valid ? groupSize : (() => {
+              // closest divisor
+              let best=1,md=Infinity;
+              for(let i=2;i<=studentsCount;i++){
+                if(studentsCount%i===0){
+                  const d=Math.abs(groupSize-i);
+                  if(d<md){md=d;best=i;}
+                }
+              }
+              return best;
+            })()
+          };
+
+          document.getElementById("validationMessage").textContent = valid ? "" : `Suggested Group Size: ${modalData.groupSize}`;
+          document.getElementById("confirmClassName").value       = modalData.name;
+          document.getElementById("confirmStudentsCount").value   = modalData.studentsCount;
+          document.getElementById("confirmGroupSize").value       = modalData.groupSize;
+
+          const createModal  = new bootstrap.Modal(document.getElementById("createClassModal"));
+          const confirmModal = new bootstrap.Modal(document.getElementById("confirmCreateClassModal"));
+          createModal.hide();
+          if (valid || !firstClick) confirmModal.show();
+          firstClick = false;
+        });
+
+      // Unlock fields
+      document.getElementById("modifyInfoBtn")
+        .addEventListener("click", () => {
+          ["confirmClassName","confirmStudentsCount","confirmGroupSize"]
+            .forEach(id => document.getElementById(id).removeAttribute("readonly"));
+        });
+
+      // Submit confirmed create via fetch
+      document.getElementById("confirmCreateClassForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          fetch(this.action, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrftoken },
+            body: formData,
+            credentials: "same-origin"
+          })
+          .then(res => {
+            if (res.redirected) window.location = res.url;
+            else return res.text();
+          })
+          .catch(err => console.error("Error saving class:", err));
+        });
+
+    });
+  </script>
+</body>
+</html>
