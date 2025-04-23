@@ -27,6 +27,8 @@ def get_gmail_credentials():
             flow = InstalledAppFlow.from_client_secrets_file(
                 'mainapp/credentials.json', SCOPES
             )
+
+
             creds = flow.run_local_server(port=8080)
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
