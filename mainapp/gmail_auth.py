@@ -23,7 +23,7 @@ def get_gmail_credentials():
             flow = InstalledAppFlow.from_client_secrets_file(
                 CLIENT_SECRET, SCOPES
             )
-            creds = flow.run_local_server(port=8080, prompt='consent')
+            creds = flow.run_console()   # ← you must have exactly this line
         with open(TOKEN_FILE, 'wb') as f:
             pickle.dump(creds, f)
 
