@@ -1,34 +1,27 @@
+# mainapp/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse, Http404, HttpResponse
-from .forms import TeacherSignupForm, TeacherLoginForm, ClassroomForm, StudentForm
+from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
+
+from .forms import TeacherSignupForm, TeacherLoginForm, ClassroomForm, StudentForm
 from .models import Classroom, Student, TestResult, Group_student
+
 from math import ceil
 import random
 import string
 import json
-import os
-import pickle
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from google.auth.transport.requests import Request
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import base64
 
-# Keep Django's SMTP send_mail available if needed elsewhere
-from django.core.mail import send_mail
-
-# Import our Gmail‑OAuth helpers
-from mainapp.gmail_auth import get_gmail_credentials, send_email_via_gmail
 groups = {
     'harmonizer': ['Warm', 'Compassionate', 'Sensitive'],
-    'thinker': ['Logical', 'Responsible', 'Organized'],
-    'persister': ['Conscientious', 'Observant', 'Committed'],
-    'promoter': ['Adaptable', 'Charismatic', 'Action-oriented'],
-    'imaginer': ['Calm', 'Reflective', 'Imaginative'],
-    'rebel': ['Creative', 'Spontaneous', 'Playful']
+    'thinker':    ['Logical', 'Responsible', 'Organized'],
+    'persister':  ['Conscientious', 'Observant', 'Committed'],
+    'promoter':   ['Adaptable', 'Charismatic', 'Action-oriented'],
+    'imaginer':   ['Calm', 'Reflective', 'Imaginative'],
+    'rebel':      ['Creative', 'Spontaneous', 'Playful']
 }
 
 # Email templates for each personality (all three languages)
@@ -245,14 +238,6 @@ EMAIL_TEMPLATES = {
     }
 }
 
-groups = {
-    'harmonizer': ['Warm', 'Compassionate', 'Sensitive'],
-    'thinker': ['Logical', 'Responsible', 'Organized'],
-    'persister': ['Conscientious', 'Observant', 'Committed'],
-    'promoter': ['Adaptable', 'Charismatic', 'Action-oriented'],
-    'imaginer': ['Calm', 'Reflective', 'Imaginative'],
-    'rebel': ['Creative', 'Spontaneous', 'Playful']
-}
 
 def home(request):
     signup_form  = TeacherSignupForm()
@@ -261,8 +246,9 @@ def home(request):
     return render(request, "home.html", {
         "signup_form": signup_form,
         "login_form":  login_form,
-        "student_form":student_form
+        "student_form": student_form
     })
+
 
 def teacher_signup(request):
     if request.method == "POST":
@@ -275,6 +261,7 @@ def teacher_signup(request):
             return JsonResponse({"success": True, "redirect_url": "/dashboard/"})
         return JsonResponse({"success": False, "errors": form.errors})
     return JsonResponse({"success": False, "message": "Invalid request."})
+
 
 def teacher_login(request):
     if request.method == "POST":
@@ -289,9 +276,11 @@ def teacher_login(request):
         return JsonResponse({"success": False, "errors": form.errors})
     return JsonResponse({"success": False, "message": "Invalid request."})
 
+
 def teacher_logout(request):
     logout(request)
     return redirect("home")
+
 
 @login_required
 def dashboard(request):
@@ -303,10 +292,12 @@ def dashboard(request):
             classroom.teacher = request.user
             classroom.save()
             print("Classroom saved with ID:", classroom.id)
+
             grp_size = classroom.group_size
             total_students = classroom.students_count
             num_groups = ceil(total_students / grp_size)
             print("Group size:", grp_size, "Number of groups:", num_groups)
+
             for i in range(1, num_groups + 1):
                 grp = Group_student(
                     classroom=classroom,
@@ -314,13 +305,16 @@ def dashboard(request):
                 )
                 grp.save()
                 print("Group created:", grp.name)
+
             return redirect("dashboard")
         else:
             print("Form errors:", form.errors)
     else:
         form = ClassroomForm()
+
     classrooms = Classroom.objects.filter(teacher=request.user)
     return render(request, "dashboard.html", {"form": form, "classrooms": classrooms})
+
 
 @login_required
 def generate_class_code(request, classroom_id):
@@ -329,6 +323,7 @@ def generate_class_code(request, classroom_id):
     classroom.code = code
     classroom.save()
     return HttpResponse(code, content_type="text/plain")
+
 
 def enter_class_code(request):
     if request.method == "POST":
@@ -352,7 +347,7 @@ def enter_class_code(request):
                 return redirect('personality_test')
             else:
                 return render(request, 'home.html', {
-                    'student_form': student_form, 
+                    'student_form': student_form,
                     'error': 'Invalid student information.'
                 })
         else:
@@ -368,32 +363,38 @@ def view_students_results(request, classroom_id):
     students = Student.objects.filter(classroom=classroom)
     return render(request, 'students_results_modal.html', {'students': students})
 
+
 def randomize_characteristics():
     all_characteristics = [char for chars in groups.values() for char in chars]
     random.shuffle(all_characteristics)
     return all_characteristics
 
+
 def personality_test(request):
     if request.method == "POST":
         selected_characteristics = request.POST.getlist('characteristics', [])
         scores = {group: 0 for group in groups}
-        for group, characteristics in groups.items():
-            for characteristic in characteristics:
-                if characteristic in selected_characteristics:
-                    scores[group] += 1
+
+        for group_name, characteristics in groups.items():
+            for char in characteristics:
+                if char in selected_characteristics:
+                    scores[group_name] += 1
+
         max_score = max(scores.values())
-        matching_groups = [group for group, score in scores.items() if score == max_score]
+        matching_groups = [grp for grp, score in scores.items() if score == max_score]
         result_group = random.choice(matching_groups) if matching_groups else None
+
         return render(request, 'result.html', {'result_group': scores})
+    
     characteristics = randomize_characteristics()
     return render(request, 'personality_test.html', {'characteristics': characteristics})
 
+
 def result(request):
     result = request.GET.get('result', '')
-    context = {
-        'result': result,
-    }
+    context = {'result': result}
     return render(request, 'result.html', context)
+
 
 def rebalance_groups(classroom):
     """
@@ -403,17 +404,17 @@ def rebalance_groups(classroom):
     # Get all students who have taken the test (score is not None)
     students = list(Student.objects.filter(classroom=classroom, score__isnull=False).order_by('id'))
     # Get all groups for the classroom in a defined order (e.g., by id)
-    groups = list(classroom.groups.all().order_by('id'))
-    num_groups = len(groups)
-    
+    groups_list = list(classroom.groups.all().order_by('id'))
+    num_groups = len(groups_list)
+
     # Clear existing group memberships
-    for group in groups:
-        group.students.clear()
-    
+    for grp in groups_list:
+        grp.students.clear()
+
     # Reassign students evenly
     for index, student in enumerate(students):
         group_index = index % num_groups  # round-robin assignment
-        groups[group_index].students.add(student)
+        groups_list[group_index].students.add(student)
 
 
 def submit_result(request):
@@ -421,6 +422,7 @@ def submit_result(request):
         student_id = request.session.get('student_id')
         if not student_id:
             return HttpResponse("Student not found. Please start the test again.", status=400)
+
         try:
             student = Student.objects.get(id=student_id)
         except Student.DoesNotExist:
@@ -442,46 +444,45 @@ def submit_result(request):
             dominant_trait=dominant_trait
         )
 
-        # --- First email via Gmail OAuth ---
+        # --- First email via SMTP ---
         template = EMAIL_TEMPLATES.get(dominant_trait.lower()) if dominant_trait else None
         if template and student.email:
-            creds = get_gmail_credentials()
-            send_email_via_gmail(
-                creds,
-                student.email,
-                template['subject'],
-                template['body']
+            subject = template['subject']
+            body = template['body']
+            send_mail(
+                subject,
+                body,
+                settings.DEFAULT_FROM_EMAIL,
+                [student.email],
+                fail_silently=False
             )
 
-        # --- Group assignment logic (unchanged) ---
+        # --- Group assignment logic ---
         available_groups = classroom.groups.all().order_by('id')
         assigned_group = None
-        for group in available_groups:
-            if group.students.count() < classroom.group_size:
-                group.students.add(student)
-                assigned_group = group
+        for grp in available_groups:
+            if grp.students.count() < classroom.group_size:
+                grp.students.add(student)
+                assigned_group = grp
                 break
+
         if not assigned_group:
             smallest_group = min(available_groups, key=lambda g: g.students.count(), default=None)
             if smallest_group:
                 smallest_group.students.add(student)
 
-        # --- Rebalance groups and second email via Gmail OAuth ---
+        # --- Rebalance groups and second email via SMTP ---
         all_students = Student.objects.filter(classroom=classroom)
         if all_students.filter(score__isnull=False).count() == classroom.students_count:
             rebalance_groups(classroom)
 
-            creds = get_gmail_credentials()
             for s in all_students:
                 student_groups = s.groups.all()
                 if student_groups.exists():
-                    group = student_groups.first()
-                    group_members = group.students.exclude(id=s.id)
+                    grp = student_groups.first()
+                    group_members = grp.students.exclude(id=s.id)
                     if group_members.exists():
-                        members_info = [
-                            f"{m.first_name} - {m.score}"
-                            for m in group_members
-                        ]
+                        members_info = [f"{m.first_name} - {m.score}" for m in group_members]
                         group_message = "\n".join(members_info)
                     else:
                         group_message = "Vous êtes seul dans votre groupe."
@@ -489,7 +490,14 @@ def submit_result(request):
                     subject = "Votre groupe d'appartenance"
                     message = f"Le groupe auquel vous appartenez est :\n{group_message}"
                     if s.email:
-                        send_email_via_gmail(creds, s.email, subject, message)
+                        send_mail(
+                            subject,
+                            message,
+                            settings.DEFAULT_FROM_EMAIL,
+                            [s.email],
+                            fail_silently=False
+                        )
 
         return redirect(f'/personality-test/result/?result={result}')
+
     return HttpResponse("Invalid request method.", status=400)
