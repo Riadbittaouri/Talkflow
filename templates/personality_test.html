@@ -8,12 +8,20 @@
     rel="stylesheet"
   />
   <title>Personality Test</title>
+  <style>
+    /* Optional: highlight completed groups in the form as soon as they’re “matched” */
+    .group-completed {
+      background-color: #d4edda;
+      border-radius: 0.5rem;
+      padding: 0.25rem;
+    }
+  </style>
 </head>
 <body class="bg-light">
   <div class="container py-5">
     <h1 class="text-center mb-4">Personality Test</h1>
 
-    <!-- Formulaire principal -->
+    <!-- The form will POST to the Django URL named 'submit_result' -->
     <form
       class="card p-4 shadow-sm"
       action="{% url 'submit_result' %}"
@@ -21,253 +29,270 @@
       id="personalityForm"
     >
       {% csrf_token %}
+
       <div class="row row-cols-2 row-cols-md-3 g-3">
-        <!-- Case 1 -->
-        <div class="col">
+        <!-- Each “col” holds one trait checkbox. We’ve given each checkbox:
+             1) value="TraitName"
+             2) a data-group="<group_key>" attribute so JS can group them.
+        -->
+
+        <!-- Harmonizer group -->
+        <div class="col group-wrapper" data-group="harmonizer">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox1"
               value="Warm"
+              data-group="harmonizer"
             />
             <label class="form-check-label" for="checkbox1">
               Warm, Chaleureux, دافئ
             </label>
           </div>
         </div>
-        <!-- Case 2 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="harmonizer">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox2"
               value="Compassionate"
+              data-group="harmonizer"
             />
             <label class="form-check-label" for="checkbox2">
               Compassionate, Compatissant, متعاطف
             </label>
           </div>
         </div>
-        <!-- Case 3 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="harmonizer">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox3"
               value="Sensitive"
+              data-group="harmonizer"
             />
             <label class="form-check-label" for="checkbox3">
               Sensitive, Sensible, حساس
             </label>
           </div>
         </div>
-        <!-- Case 4 -->
-        <div class="col">
+
+        <!-- Thinker group -->
+        <div class="col group-wrapper" data-group="thinker">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox4"
               value="Logical"
+              data-group="thinker"
             />
             <label class="form-check-label" for="checkbox4">
               Logical, Logique, منطقي
             </label>
           </div>
         </div>
-        <!-- Case 5 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="thinker">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox5"
               value="Responsible"
+              data-group="thinker"
             />
             <label class="form-check-label" for="checkbox5">
               Responsible, Responsable, مسؤول
             </label>
           </div>
         </div>
-        <!-- Case 6 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="thinker">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox6"
               value="Organized"
+              data-group="thinker"
             />
             <label class="form-check-label" for="checkbox6">
               Organized, Organisé, منظم
             </label>
           </div>
         </div>
-        <!-- Case 7 -->
-        <div class="col">
+
+        <!-- Persister group -->
+        <div class="col group-wrapper" data-group="persister">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox7"
               value="Conscientious"
+              data-group="persister"
             />
             <label class="form-check-label" for="checkbox7">
               Conscientious, Consciencieux, ملتزم
             </label>
           </div>
         </div>
-        <!-- Case 8 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="persister">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox8"
               value="Observant"
+              data-group="persister"
             />
             <label class="form-check-label" for="checkbox8">
               Observant, Observateur, ملاحظ
             </label>
           </div>
         </div>
-        <!-- Case 9 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="persister">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox9"
               value="Committed"
+              data-group="persister"
             />
             <label class="form-check-label" for="checkbox9">
               Committed, Engagé, ملتزم
             </label>
           </div>
         </div>
-        <!-- Case 10 -->
-        <div class="col">
+
+        <!-- Promoter group -->
+        <div class="col group-wrapper" data-group="promoter">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox10"
               value="Adaptable"
+              data-group="promoter"
             />
             <label class="form-check-label" for="checkbox10">
               Adaptable, Adaptable, قابل للتكيف
             </label>
           </div>
         </div>
-        <!-- Case 11 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="promoter">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox11"
               value="Charismatic"
+              data-group="promoter"
             />
             <label class="form-check-label" for="checkbox11">
               Charismatic, Charmeur, كاريزمي
             </label>
           </div>
         </div>
-        <!-- Case 12 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="promoter">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox12"
               value="Action-oriented"
+              data-group="promoter"
             />
             <label class="form-check-label" for="checkbox12">
               Action-oriented, Orienté vers l'action, موجه نحو العمل
             </label>
           </div>
         </div>
-        <!-- Case 13 -->
-        <div class="col">
+
+        <!-- Imaginer group -->
+        <div class="col group-wrapper" data-group="imaginer">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox13"
               value="Calm"
+              data-group="imaginer"
             />
             <label class="form-check-label" for="checkbox13">
               Calm, Calme, هادئ
             </label>
           </div>
         </div>
-        <!-- Case 14 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="imaginer">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox14"
               value="Reflective"
+              data-group="imaginer"
             />
             <label class="form-check-label" for="checkbox14">
               Reflective, Réfléchi, متأمل
             </label>
           </div>
         </div>
-        <!-- Case 15 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="imaginer">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox15"
               value="Imaginative"
+              data-group="imaginer"
             />
             <label class="form-check-label" for="checkbox15">
               Imaginative, Imaginatif, خيالي
             </label>
           </div>
         </div>
-        <!-- Case 16 -->
-        <div class="col">
+
+        <!-- Rebel group -->
+        <div class="col group-wrapper" data-group="rebel">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox16"
               value="Creative"
+              data-group="rebel"
             />
             <label class="form-check-label" for="checkbox16">
               Creative, Créatif, مبدع
             </label>
           </div>
         </div>
-        <!-- Case 17 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="rebel">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox17"
               value="Spontaneous"
+              data-group="rebel"
             />
             <label class="form-check-label" for="checkbox17">
               Spontaneous, Spontané, عفوي
             </label>
           </div>
         </div>
-        <!-- Case 18 -->
-        <div class="col">
+        <div class="col group-wrapper" data-group="rebel">
           <div class="form-check">
             <input
-              class="form-check-input"
+              class="form-check-input trait-checkbox"
               type="checkbox"
               id="checkbox18"
               value="Playful"
+              data-group="rebel"
             />
             <label class="form-check-label" for="checkbox18">
               Playful, Ludique, مرح
@@ -276,10 +301,10 @@
         </div>
       </div>
 
-      <!-- Champ caché pour envoyer le résultat final -->
+      <!-- Hidden field that will be filled with a comma-separated list
+           of completed personality‐keys, in the order they “finished” -->
       <input type="hidden" name="result" id="hiddenResult" />
 
-      <!-- Boutons Clear et Submit à l’intérieur du formulaire -->
       <div class="mt-4 text-center">
         <button type="button" id="clearButton" class="btn btn-danger me-3">
           Clear Selection
@@ -292,69 +317,93 @@
   </div>
 
   <script>
-    // Définition des groupes et de leurs caractéristiques
-    const groups = {
-      'harmonizer': ['Warm', 'Compassionate', 'Sensitive'],
-      'thinker':    ['Logical', 'Responsible', 'Organized'],
-      'persister':  ['Conscientious', 'Observant', 'Committed'],
-      'promoter':   ['Adaptable', 'Charismatic', 'Action-oriented'],
-      'imaginer':   ['Calm', 'Reflective', 'Imaginative'],
-      'rebel':      ['Creative', 'Spontaneous', 'Playful']
-    };
-
-    let clickedCheckboxes = [];
-    let matchedGroups = [];
-
-    // Met à jour clickedCheckboxes et matchedGroups quand on clique
-    function updateOrder(checkbox) {
-      if (checkbox.checked) {
-        clickedCheckboxes.push(checkbox.value);
-      } else {
-        clickedCheckboxes = clickedCheckboxes.filter(
-          (v) => v !== checkbox.value
-        );
-      }
-      updateMatchedGroups();
-    }
-
-    // Compare les traits cochés aux groupes et remplit matchedGroups
-    function updateMatchedGroups() {
-      matchedGroups = [];
-      for (const [group, traits] of Object.entries(groups)) {
-        const allMatched = traits.every((trait) =>
-          clickedCheckboxes.includes(trait)
-        );
-        if (allMatched) {
-          matchedGroups.push(group);
-        }
-      }
-    }
-
+    /*****************************************************************
+     * We maintain:
+     *
+     *   1) `checkedByGroup`: an object that tracks how many checkboxes
+     *      have been checked for each personality‐key.
+     *
+     *   2) `completedOrder`: an array that records the order in which
+     *      a particular personality’s third trait was clicked. As soon
+     *      as a group reaches 3 checked traits, we “complete” that group
+     *      and push its name into `completedOrder` (once only).
+     *
+     * On form‐submit, we simply write `completedOrder.join(', ')` into
+     * the hiddenResult field so Django’s view receives that exact order.
+     *****************************************************************/
     document.addEventListener("DOMContentLoaded", function () {
-      // Attacher l'événement click à chaque checkbox
-      document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-        cb.addEventListener("click", () => updateOrder(cb));
+      // STEP A: Initialize our tracking structures
+      const allGroups = ["harmonizer", "thinker", "persister", "promoter", "imaginer", "rebel"];
+      const checkedByGroup = {};
+      const completedOrder = [];
+
+      // Initialize counts for each group to zero
+      allGroups.forEach(groupName => {
+        checkedByGroup[groupName] = 0;
       });
 
-      // Bouton Clear : décocher toutes les cases et réinitialiser
-      document
-        .getElementById("clearButton")
-        .addEventListener("click", () => {
-          document
-            .querySelectorAll('input[type="checkbox"]')
-            .forEach((cb) => (cb.checked = false));
-          clickedCheckboxes = [];
-          matchedGroups = [];
-        });
+      // STEP B: Whenever any checkbox is clicked, update the count
+      document.querySelectorAll(".trait-checkbox").forEach(cb => {
+        cb.addEventListener("change", (event) => {
+          const checkbox = event.target;
+          const grp = checkbox.getAttribute("data-group");
 
-      // Avant envoi du formulaire, remplir le champ caché hiddenResult
-      document
-        .getElementById("personalityForm")
-        .addEventListener("submit", function (e) {
-          document.getElementById("hiddenResult").value =
-            matchedGroups.join(", ");
-          // Le formulaire se soumet ensuite normalement
+          // If the checkbox was just checked, increment the count
+          if (checkbox.checked) {
+            checkedByGroup[grp]++;
+          } else {
+            // If it was unchecked after having been checked, decrement the count.
+            // But only decrement if it hadn’t already “locked in” as a completed group.
+            // If the group is already in completedOrder, we do NOT remove it.
+            if (!completedOrder.includes(grp)) {
+              checkedByGroup[grp]--;
+            }
+          }
+
+          // STEP C: If this group now has exactly 3 checked items **and**
+          //         it’s not yet in completedOrder, mark it as completed:
+          if (checkedByGroup[grp] === 3 && !completedOrder.includes(grp)) {
+            completedOrder.push(grp);
+            // Optionally give a visual clue—highlight those 3 checkboxes:
+            markGroupAsCompleted(grp);
+          }
         });
+      });
+
+      // Helper: add a CSS class to visually highlight a completed group
+      function markGroupAsCompleted(groupKey) {
+        document.querySelectorAll(`.group-wrapper[data-group="${groupKey}"]`)
+          .forEach(wrapper => {
+            wrapper.classList.add("group-completed");
+          });
+      }
+
+      // STEP D: “Clear” button removes all checks and resets everything
+      document.getElementById("clearButton").addEventListener("click", () => {
+        // Uncheck all checkboxes
+        document.querySelectorAll(".trait-checkbox").forEach(cb => {
+          cb.checked = false;
+        });
+        // Reset our counters and completedOrder
+        allGroups.forEach(groupName => {
+          checkedByGroup[groupName] = 0;
+        });
+        completedOrder.length = 0; // empty the array
+        // Remove any visual highlighting
+        document.querySelectorAll(".group-wrapper").forEach(wrapper => {
+          wrapper.classList.remove("group-completed");
+        });
+        // Also clear hidden field
+        document.getElementById("hiddenResult").value = "";
+      });
+
+      // STEP E: Before the form is submitted, write completedOrder into the hidden field
+      document.getElementById("personalityForm").addEventListener("submit", function (e) {
+        // If no group has finished (completedOrder is empty),
+        // we can still pass an empty string and let Django handle it.
+        document.getElementById("hiddenResult").value = completedOrder.join(", ");
+        // The form then submits normally (no e.preventDefault())
+      });
     });
   </script>
 </body>
