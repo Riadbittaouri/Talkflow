@@ -4,11 +4,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse, Http404, HttpResponse
 from django.conf import settings
-from django.core.mail import send_mail
+# from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 
 from .forms import TeacherSignupForm, TeacherLoginForm, ClassroomForm, StudentForm
 from .models import Classroom, Student, TestResult, Group_student
+from .gmail_auth import get_gmail_credentials, send_email_via_gmail
 
 from math import ceil
 import random
@@ -449,13 +450,15 @@ def submit_result(request):
         if template and student.email:
             subject = template['subject']
             body = template['body']
-            send_mail(
-                subject,
-                body,
-                settings.DEFAULT_FROM_EMAIL,
-                [student.email],
-                fail_silently=False
-            )
+            try:
+                creds = get_gmail_credentials()
+            except Exception as e:
+                # Nous affichons un message d’erreur précis en dev (retourné en HttpResponse pour diagnostiquer)
+                return HttpResponse(f"Erreur OAuth Gmail : {e}", status=500)
+
+            # Envoi via API Gmail
+            send_email_via_gmail(creds, student.email, subject, body)
+
 
         # --- Group assignment logic ---
         available_groups = classroom.groups.all().order_by('id')
@@ -490,13 +493,15 @@ def submit_result(request):
                     subject = "Votre groupe d'appartenance"
                     message = f"Le groupe auquel vous appartenez est :\n{group_message}"
                     if s.email:
-                        send_mail(
-                            subject,
-                            message,
-                            settings.DEFAULT_FROM_EMAIL,
-                            [s.email],
-                            fail_silently=False
-                        )
+                        try:
+                            creds = get_gmail_credentials()
+                        except Exception as e:
+                            # Nous affichons un message d’erreur précis en dev (retourné en HttpResponse pour diagnostiquer)
+                            return HttpResponse(f"Erreur OAuth Gmail : {e}", status=500)
+
+                        # Envoi via API Gmail
+                        send_email_via_gmail(creds, student.email, subject, body)
+
 
         return redirect(f'/personality-test/result/?result={result}')
 
