@@ -83,7 +83,7 @@ if DATABASE_URL:
         "default": dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,    # keep connections open for reuse (optional but recommended)
-            ssl_require=True     # enforce SSL if your Render Postgres requires it
+            ssl_require=False     # enforce SSL if your Render Postgres requires it
         )
     }
 else:
