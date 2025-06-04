@@ -417,7 +417,6 @@ def rebalance_groups(classroom):
         group_index = index % num_groups  # round-robin assignment
         groups_list[group_index].students.add(student)
 
-
 def submit_result(request):
     if request.method == 'POST':
         student_id = request.session.get('student_id')
@@ -434,33 +433,27 @@ def submit_result(request):
         if not result:
             return HttpResponse("No result provided.", status=400)
 
+        # 1) Parse and save the student's dominant trait
         selected_characteristics = result.split(', ')
         dominant_trait = selected_characteristics[0] if selected_characteristics else None
         student.score = dominant_trait
         student.save()
 
+        # 2) Create a TestResult record (answers + dominant_trait)
         TestResult.objects.create(
             student=student,
             answers={"selected_characteristics": selected_characteristics},
             dominant_trait=dominant_trait
         )
 
-        # --- First email via SMTP ---
-        template = EMAIL_TEMPLATES.get(dominant_trait.lower()) if dominant_trait else None
-        if template and student.email:
-            subject = template['subject']
-            body = template['body']
-            try:
-                creds = get_gmail_credentials()
-            except Exception as e:
-                # Nous affichons un message d’erreur précis en dev (retourné en HttpResponse pour diagnostiquer)
-                return HttpResponse(f"Erreur OAuth Gmail : {e}", status=500)
+        # --- EMAIL BLOCK REMOVED HERE ---
+        # (Everything from “# --- First email via SMTP ---” through the end of that block
+        #  has been deleted.)
+        #
+        # if template and student.email:
+        #     … (all SMTP / Gmail‐API calls) …
 
-            # Envoi via API Gmail
-            send_email_via_gmail(creds, student.email, subject, body)
-
-
-        # --- Group assignment logic ---
+        # --- Group assignment logic (unchanged) ---
         available_groups = classroom.groups.all().order_by('id')
         assigned_group = None
         for grp in available_groups:
@@ -474,35 +467,109 @@ def submit_result(request):
             if smallest_group:
                 smallest_group.students.add(student)
 
-        # --- Rebalance groups and second email via SMTP ---
+        # --- Rebalance groups (email sending removed) ---
         all_students = Student.objects.filter(classroom=classroom)
         if all_students.filter(score__isnull=False).count() == classroom.students_count:
             rebalance_groups(classroom)
 
-            for s in all_students:
-                student_groups = s.groups.all()
-                if student_groups.exists():
-                    grp = student_groups.first()
-                    group_members = grp.students.exclude(id=s.id)
-                    if group_members.exists():
-                        members_info = [f"{m.first_name} - {m.score}" for m in group_members]
-                        group_message = "\n".join(members_info)
-                    else:
-                        group_message = "Vous êtes seul dans votre groupe."
+            # We no longer send the “Your group membership” e-mail to everyone:
+            # for s in all_students:
+            #     … (email block removed) …
 
-                    subject = "Votre groupe d'appartenance"
-                    message = f"Le groupe auquel vous appartenez est :\n{group_message}"
-                    if s.email:
-                        try:
-                            creds = get_gmail_credentials()
-                        except Exception as e:
-                            # Nous affichons un message d’erreur précis en dev (retourné en HttpResponse pour diagnostiquer)
-                            return HttpResponse(f"Erreur OAuth Gmail : {e}", status=500)
+        # Instead of redirecting to “/personality-test/result/”, we simply re-render the test page:
+        return render(request, 'personality_test.html')
 
-                        # Envoi via API Gmail
-                        send_email_via_gmail(creds, student.email, subject, body)
-
-
-        return redirect(f'/personality-test/result/?result={result}')
-
+    # If not a POST, it’s an invalid request for this endpoint:
     return HttpResponse("Invalid request method.", status=400)
+
+
+
+
+# def submit_result(request):
+#     if request.method == 'POST':
+#         student_id = request.session.get('student_id')
+#         if not student_id:
+#             return HttpResponse("Student not found. Please start the test again.", status=400)
+
+#         try:
+#             student = Student.objects.get(id=student_id)
+#         except Student.DoesNotExist:
+#             return HttpResponse("Student not found. Please start the test again.", status=400)
+
+#         classroom = student.classroom
+#         result = request.POST.get('result', '')
+#         if not result:
+#             return HttpResponse("No result provided.", status=400)
+
+#         selected_characteristics = result.split(', ')
+#         dominant_trait = selected_characteristics[0] if selected_characteristics else None
+#         student.score = dominant_trait
+#         student.save()
+
+#         TestResult.objects.create(
+#             student=student,
+#             answers={"selected_characteristics": selected_characteristics},
+#             dominant_trait=dominant_trait
+#         )
+
+#         # --- First email via SMTP ---
+#         template = EMAIL_TEMPLATES.get(dominant_trait.lower()) if dominant_trait else None
+#         if template and student.email:
+#             subject = template['subject']
+#             body = template['body']
+#             try:
+#                 creds = get_gmail_credentials()
+#             except Exception as e:
+#                 # Nous affichons un message d’erreur précis en dev (retourné en HttpResponse pour diagnostiquer)
+#                 return HttpResponse(f"Erreur OAuth Gmail : {e}", status=500)
+
+#             # Envoi via API Gmail
+#             send_email_via_gmail(creds, student.email, subject, body)
+
+
+#         # --- Group assignment logic ---
+#         available_groups = classroom.groups.all().order_by('id')
+#         assigned_group = None
+#         for grp in available_groups:
+#             if grp.students.count() < classroom.group_size:
+#                 grp.students.add(student)
+#                 assigned_group = grp
+#                 break
+
+#         if not assigned_group:
+#             smallest_group = min(available_groups, key=lambda g: g.students.count(), default=None)
+#             if smallest_group:
+#                 smallest_group.students.add(student)
+
+#         # --- Rebalance groups and second email via SMTP ---
+#         all_students = Student.objects.filter(classroom=classroom)
+#         if all_students.filter(score__isnull=False).count() == classroom.students_count:
+#             rebalance_groups(classroom)
+
+#             for s in all_students:
+#                 student_groups = s.groups.all()
+#                 if student_groups.exists():
+#                     grp = student_groups.first()
+#                     group_members = grp.students.exclude(id=s.id)
+#                     if group_members.exists():
+#                         members_info = [f"{m.first_name} - {m.score}" for m in group_members]
+#                         group_message = "\n".join(members_info)
+#                     else:
+#                         group_message = "Vous êtes seul dans votre groupe."
+
+#                     subject = "Votre groupe d'appartenance"
+#                     message = f"Le groupe auquel vous appartenez est :\n{group_message}"
+#                     if s.email:
+#                         try:
+#                             creds = get_gmail_credentials()
+#                         except Exception as e:
+#                             # Nous affichons un message d’erreur précis en dev (retourné en HttpResponse pour diagnostiquer)
+#                             return HttpResponse(f"Erreur OAuth Gmail : {e}", status=500)
+
+#                         # Envoi via API Gmail
+#                         send_email_via_gmail(creds, student.email, subject, body)
+
+
+#         return redirect(f'/personality-test/result/?result={result}')
+
+#     return HttpResponse("Invalid request method.", status=400)
