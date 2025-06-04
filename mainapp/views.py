@@ -477,7 +477,7 @@ def submit_result(request):
             #     … (email block removed) …
 
         # Instead of redirecting to “/personality-test/result/”, we simply re-render the test page:
-        return render(request, 'personality_test.html')
+        return render(request, 'result.html')
 
     # If not a POST, it’s an invalid request for this endpoint:
     return HttpResponse("Invalid request method.", status=400)
