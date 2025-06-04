@@ -294,18 +294,18 @@
   <script>
     // Définition des groupes et de leurs caractéristiques
     const groups = {
-      harmonizer: ["Warm", "Compassionate", "Sensitive"],
-      thinker: ["Logical", "Responsible", "Organized"],
-      persister: ["Conscientious", "Observant", "Committed"],
-      promoter: ["Adaptable", "Charismatic", "Action-oriented"],
-      imaginer: ["Calm", "Reflective", "Imaginative"],
-      rebel: ["Creative", "Spontaneous", "Playful"],
+      'harmonizer': ['Warm', 'Compassionate', 'Sensitive'],
+      'thinker':    ['Logical', 'Responsible', 'Organized'],
+      'persister':  ['Conscientious', 'Observant', 'Committed'],
+      'promoter':   ['Adaptable', 'Charismatic', 'Action-oriented'],
+      'imaginer':   ['Calm', 'Reflective', 'Imaginative'],
+      'rebel':      ['Creative', 'Spontaneous', 'Playful']
     };
 
     let clickedCheckboxes = [];
     let matchedGroups = [];
 
-    // Met à jour la liste clickedCheckboxes et matchedGroups quand on clique sur une case
+    // Met à jour clickedCheckboxes et matchedGroups quand on clique
     function updateOrder(checkbox) {
       if (checkbox.checked) {
         clickedCheckboxes.push(checkbox.value);
@@ -317,7 +317,7 @@
       updateMatchedGroups();
     }
 
-    // Compare les traits cochés aux groupes définis
+    // Compare les traits cochés aux groupes et remplit matchedGroups
     function updateMatchedGroups() {
       matchedGroups = [];
       for (const [group, traits] of Object.entries(groups)) {
@@ -336,7 +336,7 @@
         cb.addEventListener("click", () => updateOrder(cb));
       });
 
-      // Bouton Clear : décocher toutes les cases et réinitialiser les tableaux
+      // Bouton Clear : décocher toutes les cases et réinitialiser
       document
         .getElementById("clearButton")
         .addEventListener("click", () => {
@@ -347,7 +347,7 @@
           matchedGroups = [];
         });
 
-      // Avant d'envoyer le formulaire, on remplit le champ caché hiddenResult
+      // Avant envoi du formulaire, remplir le champ caché hiddenResult
       document
         .getElementById("personalityForm")
         .addEventListener("submit", function (e) {
