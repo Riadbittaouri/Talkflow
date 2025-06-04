@@ -1,5 +1,5 @@
 # mainapp/gmail_auth.py
-import os, pickle, json, base64
+import os, pickle, base64
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
@@ -7,7 +7,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 SCOPES        = ['https://www.googleapis.com/auth/gmail.send']
-TOKEN_FILE    = 'token.pickle'
+# Absolute path inside Render container:
+TOKEN_FILE    = '/etc/secrets/token.pickle'
 CLIENT_SECRET = os.environ.get('GOOGLE_CREDENTIALS_FILE', '/etc/secrets/credentials.json')
 
 def get_gmail_credentials():
@@ -23,7 +24,8 @@ def get_gmail_credentials():
             flow = InstalledAppFlow.from_client_secrets_file(
                 CLIENT_SECRET, SCOPES
             )
-            creds = flow.run_console()   # ← you must have exactly this line
+            # Must be run_console() so there’s no browser‐based redirect:
+            creds = flow.run_console()
         with open(TOKEN_FILE, 'wb') as f:
             pickle.dump(creds, f)
 
