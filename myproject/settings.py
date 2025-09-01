@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8_u&a!+7_-ab=og(#a+iy8biu0yvs9=%w+4@l*ed&owk$pw@(b
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG=True
-    
+
 ALLOWED_HOSTS = ["*"]
 
 
@@ -43,7 +43,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,7 +83,7 @@ if DATABASE_URL:
         "default": dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,    # keep connections open for reuse (optional but recommended)
-            ssl_require=False     # enforce SSL if your Render Postgres requires it
+            ssl_require=True     # enforce SSL if your Render Postgres requires it
         )
     }
 else:
